@@ -3,26 +3,24 @@ package com.poapp.Poapp.controller;
 import com.poapp.Poapp.entity.Stock;
 import com.poapp.Poapp.repository.StockRepository;
 import com.poapp.Poapp.service.StockService;
+import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.query.sql.internal.ParameterRecognizerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping(path = "/api")
 public class StockController {
 
-//    private StockRepository stockRepository;
+    private StockRepository stockRepository;
     private final StockService stockService;
 
     @Autowired
     public StockController(StockRepository stockRepository, StockService stockService){
-//        this.stockRepository = stockRepository;
+        this.stockRepository = stockRepository;
         this.stockService = stockService;
     }
 
@@ -52,6 +50,18 @@ public class StockController {
                     .body("Error adding/updating stock: " + e.getMessage());
         }
     }*/
+
+    @GetMapping("/getStock")
+    public ResponseEntity<Stock> getStock(@RequestParam(name = "stockId") Long stockId){
+        try{
+            Stock response = stockRepository.findById(stockId)
+                    .orElseThrow(() -> new EntityNotFoundException("Stock not found"));
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(new Stock(), HttpStatus.NOT_FOUND);
+        }
+
+    }
 
     @PostMapping("/uploadCSV")
     public ResponseEntity<String> handleCSVFileUpload(@RequestBody MultipartFile file) {

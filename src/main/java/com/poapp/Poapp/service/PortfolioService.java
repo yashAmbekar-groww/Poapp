@@ -25,7 +25,8 @@ public class PortfolioService {
     public PortfolioController.PortfolioResponse getUserPortfolio(Long userAccId){
 
         try{
-            List<Holding> holdings = holdingRepository.findByUserAccId(userAccId);
+            List<Holding> holdings = holdingRepository.findByUserAccId(userAccId)
+                    .orElseThrow(()-> new RuntimeException("Holding not found"));
 
             int totalStocksInvested = holdings.size();
 

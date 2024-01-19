@@ -28,7 +28,16 @@ public class TradeService {
     @Transactional
     public TradeController.TradeResponse executeTrade(Long userAccId, String tradeType, int quantity, Long stockId) {
 
+        if (!tradeType.equalsIgnoreCase("Buy") && !tradeType.equalsIgnoreCase("Sell")) {
+            throw new RuntimeException("Invalid trade type. Allowed values are 'Buy' or 'Sell'.");
+        }
+
+        // Validate quantity (Assuming quantity must be a positive integer)
+        if (quantity <= 0) {
+            throw new RuntimeException("Invalid quantity. Quantity must be a positive integer.");
+        }
         try {
+
 
             Holding holding = holdingRepository.findByUserAccIdAndStockId(userAccId, stockId)
                     .orElseGet(() -> {
@@ -45,14 +54,7 @@ public class TradeService {
                     });
 
             // Validate tradeType (Assuming "Buy" or "Sell" are the only valid values)
-            if (!tradeType.equalsIgnoreCase("Buy") && !tradeType.equalsIgnoreCase("Sell")) {
-                throw new RuntimeException("Invalid trade type. Allowed values are 'Buy' or 'Sell'.");
-            }
 
-            // Validate quantity (Assuming quantity must be a positive integer)
-            if (quantity <= 0) {
-                throw new RuntimeException("Invalid quantity. Quantity must be a positive integer.");
-            }
 
             if (tradeType.equalsIgnoreCase("Buy")) {
                 executeBuyTrade(holding, quantity, stockId);
@@ -88,18 +90,21 @@ public class TradeService {
     }
 
 
-    private void executeBuyTrade(Holding holding, int quantity, Long stockId) {
+    public void executeBuyTrade(Holding holding, int quantity, Long stockId) {
         int newQuantity = holding.getQuantity() + quantity;
-        float currentPrice = stockRepository.findById(stockId)
+        Float currentPrice = stockRepository.findById(stockId)
                 .orElseThrow(() -> new RuntimeException("Stock not found with ID: " + stockId))
                 .getCurrPrice();
+        if (currentPrice == null) {
+            throw new RuntimeException("Current price is null for stock with ID: " + stockId);
+        }
         Float newBuyPrice = ((holding.getBuyPrice() * holding.getQuantity()) + (currentPrice * quantity)) / quantity + holding.getQuantity();
         holding.setBuyPrice(newBuyPrice);
         holding.setQuantity(newQuantity);
         holdingRepository.save(holding);
     }
 
-    private void executeSellTrade(Holding holding, int quantity) {
+    public void executeSellTrade(Holding holding, int quantity) {
         int availableQuantity = holding.getQuantity();
         if (quantity > availableQuantity) {
             throw new RuntimeException("Insufficient stock quantity available for sell.");

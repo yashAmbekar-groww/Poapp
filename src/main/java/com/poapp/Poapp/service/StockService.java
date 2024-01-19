@@ -64,6 +64,9 @@ public class StockService {
                         stock.setClosePrice(Float.parseFloat(nextLine[8]));
                         stock.setCurrPrice(Float.parseFloat(nextLine[8]));
                     }
+                    else {
+                        throw new CsvValidationException();
+                    }
                 }catch (Exception e){
                     e.printStackTrace();
                 }

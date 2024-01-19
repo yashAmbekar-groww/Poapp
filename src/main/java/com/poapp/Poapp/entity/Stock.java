@@ -13,15 +13,15 @@ public class Stock {
     @Column(unique = true)
     private String stockName;
 
-    private Float openPrice;
+    private Float openPrice = 0.0f;
 
-    private Float closePrice;
+    private Float closePrice = 0.0f;
 
-    private Float highPrice;
+    private Float highPrice = 0.0f;
 
-    private Float lowPrice;
+    private Float lowPrice = 0.0f;
 
-    private Float currPrice;
+    private Float currPrice = 0.0f;
 
 }
 

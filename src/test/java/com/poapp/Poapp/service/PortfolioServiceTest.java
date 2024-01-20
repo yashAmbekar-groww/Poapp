@@ -37,67 +37,53 @@ public class PortfolioServiceTest {
 
     @Test
     public void testGetUserPortfolio_Success() {
-        // Arrange
+
         Long userAccId = 123L;
         List<Holding> holdings = createSampleHoldings();
         when(holdingRepository.findByUserAccId(userAccId)).thenReturn(Optional.of(holdings));
 
-        // Mocking stockRepository calls
         when(stockRepository.findById(anyLong())).thenReturn(Optional.of(createSampleStock()));
 
-        // Act
         PortfolioController.PortfolioResponse response = portfolioService.getUserPortfolio(userAccId);
 
-        // Assert
         assertEquals("Success", response.getStatus());
         assertEquals("Portfolio Retrieved!", response.getMsg());
         assertEquals(holdings, response.getHoldings());
         assertEquals(holdings.size(), response.getTotalStocksInvested());
-        // Add more assertions based on your expectations
     }
 
     @Test
     public void testGetUserPortfolio_HoldingsNotFound() {
-        // Arrange
         Long userAccId = 123L;
         when(holdingRepository.findByUserAccId(userAccId)).thenReturn(Optional.empty());
 
-        // Act
         PortfolioController.PortfolioResponse response = portfolioService.getUserPortfolio(userAccId);
 
-        // Assert
         assertEquals("Failure", response.getStatus());
         assertEquals("Holding not found", response.getMsg());
         assertEquals(0, response.getTotalStocksInvested());
-        // Add more assertions based on your expectations
     }
 
     @Test
     public void testGetUserPortfolio_RuntimeException() {
-        // Arrange
+
         Long userAccId = 123L;
         when(holdingRepository.findByUserAccId(userAccId)).thenThrow(new RuntimeException("Test Exception"));
 
-        // Act
         PortfolioController.PortfolioResponse response = portfolioService.getUserPortfolio(userAccId);
 
-        // Assert
         assertEquals("Failure", response.getStatus());
         assertEquals("Test Exception", response.getMsg());
         assertEquals(0, response.getTotalStocksInvested());
-        // Add more assertions based on your expectations
     }
 
     private List<Holding> createSampleHoldings() {
         List<Holding> holdings = new ArrayList<>();
-        // Create sample holdings for testing
-        // Ensure that the sample holdings cover different scenarios
         return holdings;
     }
 
     private Stock createSampleStock() {
         Stock stock = new Stock();
-        // Set necessary properties for testing
         return stock;
     }
 }

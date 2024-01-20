@@ -4,9 +4,11 @@ import com.poapp.Poapp.entity.Stock;
 import com.poapp.Poapp.repository.StockRepository;
 import com.poapp.Poapp.service.StockService;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.commons.io.FilenameUtils;
 import org.hibernate.query.sql.internal.ParameterRecognizerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,6 +68,11 @@ public class StockController {
     @PostMapping("/uploadCSV")
     public ResponseEntity<String> handleCSVFileUpload(@RequestBody MultipartFile file) {
         try {
+            String fileExtension = FilenameUtils.getExtension(file.getOriginalFilename());
+            if (!"csv".equalsIgnoreCase(fileExtension)) {
+                return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body("Only CSV files are supported");
+            }
+
             stockService.processCSV(file);
             return ResponseEntity.ok("CSV data uploaded successfully");
         } catch (Exception e) {

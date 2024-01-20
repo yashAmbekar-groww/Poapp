@@ -28,7 +28,6 @@ public class StockService {
             List<Stock> entities = parseCSV(file);
             stockRepository.saveAll(entities);
         } catch (IOException | CsvValidationException e) {
-            // Handle the exception (e.g., log it or return an error response)
             e.printStackTrace();
         }
     }
@@ -69,6 +68,7 @@ public class StockService {
                     }
                 }catch (Exception e){
                     e.printStackTrace();
+                    throw new CsvValidationException("Error while processing CSV file");
                 }
 
                 stocks.add(stock);
